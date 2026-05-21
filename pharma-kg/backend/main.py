@@ -1,4 +1,5 @@
 import logging
+import os
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
@@ -15,14 +16,19 @@ from db import init_db
 
 app = FastAPI(title="Pharma Supply Chain Knowledge Graph API")
 
+allowed_origins_raw = os.getenv(
+    "ALLOWED_ORIGINS",
+    "http://localhost:5173,http://localhost:5174,http://localhost:3000"
+)
+allowed_origins = [origin.strip() for origin in allowed_origins_raw.split(",") if origin.strip()]
+allow_credentials = True
+if "*" in allowed_origins:
+    allow_credentials = False
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:5173",
-        "http://localhost:5174",
-        "http://localhost:3000",
-    ],
-    allow_credentials=True,
+    allow_origins=allowed_origins if "*" not in allowed_origins else ["*"],
+    allow_credentials=allow_credentials,
     allow_methods=["*"],
     allow_headers=["*"],
 )
