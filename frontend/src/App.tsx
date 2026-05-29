@@ -414,13 +414,20 @@ function AppPage({
 /* ── Root App ──────────────────────────────────────────────────────── */
 function AppContent() {
   const { data, loading, error, search, searchHistory, saveSupplier, clearData } = useGraphData();
+  const [hasSearched, setHasSearched] = useState(false);
+
+  const handleSearch = useCallback((q: string) => {
+    setHasSearched(true);
+    search(q);
+  }, [search]);
 
   const handleGoHome = useCallback(() => {
+    setHasSearched(false);
     if (clearData) clearData();
   }, [clearData]);
 
-  if (!data && !loading) {
-    return <LandingPage onSearch={search} loading={loading} />;
+  if (!hasSearched) {
+    return <LandingPage onSearch={handleSearch} loading={loading} />;
   }
 
   return (
